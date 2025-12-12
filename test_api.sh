@@ -61,7 +61,11 @@ check_server
 print_section "1. Health Check"
 print_info "Testing: GET $SERVER_URL/health"
 echo ""
-HEALTH_RESPONSE=$(curl -s "$SERVER_URL/health")
+HEALTH_RESPONSE=$(curl -s "$SERVER_URL/health" || echo "")
+if [ -z "$HEALTH_RESPONSE" ]; then
+    print_error "Failed to get health response"
+    exit 1
+fi
 echo "$HEALTH_RESPONSE" | python3 -m json.tool 2>/dev/null || echo "$HEALTH_RESPONSE"
 print_success "Health check passed"
 
@@ -69,7 +73,11 @@ print_success "Health check passed"
 print_section "2. API Information"
 print_info "Testing: GET $SERVER_URL/"
 echo ""
-ROOT_RESPONSE=$(curl -s "$SERVER_URL/")
+ROOT_RESPONSE=$(curl -s "$SERVER_URL/" || echo "")
+if [ -z "$ROOT_RESPONSE" ]; then
+    print_error "Failed to get API info"
+    exit 1
+fi
 echo "$ROOT_RESPONSE" | python3 -m json.tool 2>/dev/null || echo "$ROOT_RESPONSE"
 print_success "API info retrieved"
 

@@ -97,8 +97,7 @@ start_server() {
     
     # Start server in background
     print_info "Starting server on port $SERVER_PORT..."
-    source "$VENV_PATH/bin/activate"
-    nohup python3 "$SERVER_SCRIPT" >> "$LOG_FILE" 2>&1 &
+    nohup "$VENV_PATH/bin/python3" "$SERVER_SCRIPT" >> "$LOG_FILE" 2>&1 &
     PID=$!
     echo $PID > "$PID_FILE"
     

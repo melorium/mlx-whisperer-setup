@@ -15,6 +15,12 @@ from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.responses import JSONResponse
 import uvicorn
 
+# Import mlx_whisper at module level
+try:
+    import mlx_whisper
+except ImportError:
+    mlx_whisper = None
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -26,8 +32,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Global model variable - lazy loading
-whisper_model = None
+# Global model variable - tracks if module is loaded
+model_initialized = False
 MODEL_NAME = "mlx-community/whisper-large-v3-turbo"
 
 app = FastAPI(
@@ -37,19 +43,19 @@ app = FastAPI(
 )
 
 
-def load_model():
-    """Lazy load the Whisper model on first request"""
-    global whisper_model
-    if whisper_model is None:
-        try:
-            logger.info(f"Loading model: {MODEL_NAME}")
-            import mlx_whisper
-            whisper_model = MODEL_NAME
-            logger.info("Model loaded successfully")
-        except Exception as e:
-            logger.error(f"Failed to load model: {e}")
-            raise HTTPException(status_code=500, detail=f"Failed to load model: {str(e)}")
-    return whisper_model
+def ensure_model_ready():
+    """Ensure mlx_whisper is available (lazy loading handled by mlx_whisper.transcribe)"""
+    global model_initialized
+    if not model_initialized:
+        if mlx_whisper is None:
+            logger.error("mlx_whisper module not available")
+            raise HTTPException(
+                status_code=500, 
+                detail="mlx_whisper module not installed. Run: pip install mlx-whisper"
+            )
+        logger.info(f"MLX Whisper ready. Model '{MODEL_NAME}' will be loaded on first use.")
+        model_initialized = True
+    return True
 
 
 @app.get("/")
@@ -71,11 +77,10 @@ async def root():
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
-    model_loaded = whisper_model is not None
     return {
         "status": "healthy",
         "model": MODEL_NAME,
-        "model_loaded": model_loaded,
+        "model_initialized": model_initialized,
         "port": 9180
     }
 
@@ -100,8 +105,8 @@ async def transcribe_audio(
     temp_file = None
     
     try:
-        # Load model if not already loaded
-        load_model()
+        # Ensure mlx_whisper is ready
+        ensure_model_ready()
         
         # Validate task
         if task not in ["transcribe", "translate"]:
@@ -123,16 +128,13 @@ async def transcribe_audio(
         
         logger.info(f"Processing audio file: {temp_file} ({len(content)} bytes)")
         
-        # Transcribe using mlx-whisper
-        import mlx_whisper
-        
         # Prepare transcription options
         transcribe_options = {
             "language": language if language else None,
             "task": task
         }
         
-        # Perform transcription
+        # Perform transcription (mlx_whisper handles model loading internally)
         result = mlx_whisper.transcribe(
             temp_file,
             path_or_hf_repo=MODEL_NAME,
