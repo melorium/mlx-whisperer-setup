@@ -33,7 +33,6 @@ def transcribe_file(audio_path: str,
     
     # Prepare the request
     url = f"{api_url}/transcribe"
-    files = {"file": open(audio_path, "rb")}
     data = {"model": model}
     
     if language:
@@ -41,7 +40,9 @@ def transcribe_file(audio_path: str,
     
     # Send request
     print(f"Transcribing {audio_file.name} with model '{model}'...")
-    response = requests.post(url, files=files, data=data)
+    with open(audio_path, "rb") as f:
+        files = {"file": f}
+        response = requests.post(url, files=files, data=data)
     
     # Check response
     if response.status_code == 200:

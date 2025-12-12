@@ -1,3 +1,13 @@
+# Systemd service file for MLX Whisperer API Server
+# 
+# Installation instructions:
+# 1. Replace YOUR_USERNAME with your actual username
+# 2. Replace /path/to/mlx-whisperer-setup with the actual path to this directory
+# 3. Copy this file to /etc/systemd/system/mlx-whisperer.service
+# 4. Run: sudo systemctl daemon-reload
+# 5. Run: sudo systemctl enable mlx-whisperer
+# 6. Run: sudo systemctl start mlx-whisperer
+
 [Unit]
 Description=MLX Whisperer API Server
 After=network.target
