@@ -1,0 +1,38 @@
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# MLX Whisperer specific
+.whisperer.pid
+whisperer.log
+
+# Audio files
+*.mp3
+*.wav
+*.m4a
+*.flac
+*.ogg
+*.opus
+*.aac
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
