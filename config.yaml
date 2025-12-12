@@ -1,0 +1,28 @@
+# MLX Whisperer Configuration
+server:
+  host: "0.0.0.0"
+  port: 9180
+  reload: false
+
+whisper:
+  # Model size: tiny, base, small, medium, large
+  model: "base"
+  # Language (optional, auto-detect if not specified)
+  language: null
+  # Task: transcribe or translate
+  task: "transcribe"
+  # Temperature for sampling
+  temperature: 0.0
+  # Condition on previous text
+  condition_on_previous_text: true
+
+audio:
+  # Supported formats
+  formats:
+    - "wav"
+    - "mp3"
+    - "m4a"
+    - "flac"
+    - "ogg"
+  # Max file size in MB
+  max_size_mb: 25

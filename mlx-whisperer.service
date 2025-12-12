@@ -1,0 +1,15 @@
+[Unit]
+Description=MLX Whisperer API Server
+After=network.target
+
+[Service]
+Type=simple
+User=YOUR_USERNAME
+WorkingDirectory=/path/to/mlx-whisperer-setup
+Environment="PATH=/path/to/mlx-whisperer-setup/venv/bin"
+ExecStart=/path/to/mlx-whisperer-setup/venv/bin/python3 /path/to/mlx-whisperer-setup/api_server.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
